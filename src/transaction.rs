@@ -9,7 +9,7 @@ pub enum Transaction {
     Withdrawal(u16, u32, Decimal),
     Dispute(u16, u32),
     Resolve(u16, u32),
-    Chargeback(u16, u32)
+    Chargeback(u16, u32),
 }
 
 #[derive(Debug)]
@@ -26,7 +26,12 @@ impl Display for TransactionError {
 }
 
 impl Transaction {
-    pub fn new(ttype: &str, client: u16, tx: u32, amount: Decimal) -> Result<Self, TransactionError> {
+    pub fn new(
+        ttype: &str,
+        client: u16,
+        tx: u32,
+        amount: Decimal,
+    ) -> Result<Self, TransactionError> {
         match ttype {
             "deposit" => Ok(Transaction::Deposit(client, tx, amount)),
             "withdrawal" => Ok(Transaction::Withdrawal(client, tx, amount)),
@@ -148,13 +153,22 @@ chargeback,5,104,";
 
         let mut reader = csv::Reader::from_reader(csv_data.as_bytes());
 
-        let transactions = reader.records().map(|rec| {
-            let record = rec.unwrap();
-            record.deserialize(None).unwrap()
-        }).collect::<Vec<Transaction>>();
+        let transactions = reader
+            .records()
+            .map(|rec| {
+                let record = rec.unwrap();
+                record.deserialize(None).unwrap()
+            })
+            .collect::<Vec<Transaction>>();
         assert_eq!(transactions.len(), 5);
-        assert_eq!(transactions[0], Transaction::Deposit(1, 100, Decimal::new(100000, 4)));
-        assert_eq!(transactions[1], Transaction::Withdrawal(2, 101, Decimal::new(51235, 4)));
+        assert_eq!(
+            transactions[0],
+            Transaction::Deposit(1, 100, Decimal::new(100000, 4))
+        );
+        assert_eq!(
+            transactions[1],
+            Transaction::Withdrawal(2, 101, Decimal::new(51235, 4))
+        );
         assert_eq!(transactions[2], Transaction::Dispute(3, 102));
         assert_eq!(transactions[3], Transaction::Resolve(4, 103));
         assert_eq!(transactions[4], Transaction::Chargeback(5, 104));

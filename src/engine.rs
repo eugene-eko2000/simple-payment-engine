@@ -1,4 +1,7 @@
-use std::{collections::{BTreeMap, BTreeSet}, io};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    io,
+};
 
 use csv::Writer;
 use rust_decimal::Decimal;
@@ -85,7 +88,10 @@ impl Engine {
         Ok(())
     }
 
-    fn fetch_or_create_client_mut(&mut self, client_id: u16) -> Result<&mut Client, ExecutionError> {
+    fn fetch_or_create_client_mut(
+        &mut self,
+        client_id: u16,
+    ) -> Result<&mut Client, ExecutionError> {
         let client = self
             .clients
             .entry(client_id)
@@ -127,7 +133,10 @@ impl Engine {
     }
 
     fn fetch_disputed_transaction(&self, tx_id: u32) -> Result<(u16, Decimal), ExecutionError> {
-        let transaction = self.transaction_log.get(&tx_id).ok_or(ExecutionError::TransactionNotFound)?;
+        let transaction = self
+            .transaction_log
+            .get(&tx_id)
+            .ok_or(ExecutionError::TransactionNotFound)?;
         match transaction {
             Transaction::Deposit(client_id, _, amount) => Ok((*client_id, *amount)),
             Transaction::Withdrawal(client_id, _, amount) => Ok((*client_id, *amount)),
@@ -228,9 +237,15 @@ mod tests {
             assert!(client1.locked);
         }
         let deposit_after_lock = Transaction::Deposit(1, 101, Decimal::new(50000, 4));
-        assert_eq!(engine.execute(deposit_after_lock).err(), Some(ExecutionError::AccountLocked));
+        assert_eq!(
+            engine.execute(deposit_after_lock).err(),
+            Some(ExecutionError::AccountLocked)
+        );
         let withdraw_after_lock = Transaction::Withdrawal(1, 102, Decimal::new(50000, 4));
-        assert_eq!(engine.execute(withdraw_after_lock).err(), Some(ExecutionError::AccountLocked));
+        assert_eq!(
+            engine.execute(withdraw_after_lock).err(),
+            Some(ExecutionError::AccountLocked)
+        );
     }
 
     #[test]
@@ -239,9 +254,15 @@ mod tests {
         let deposit = Transaction::Deposit(1, 100, Decimal::new(100000, 4));
         assert!(engine.execute(deposit).is_ok());
         let resolve = Transaction::Resolve(1, 100);
-        assert_eq!(engine.execute(resolve).err(), Some(ExecutionError::NonDisputedTransaction));
+        assert_eq!(
+            engine.execute(resolve).err(),
+            Some(ExecutionError::NonDisputedTransaction)
+        );
         let chargeback = Transaction::Chargeback(1, 100);
-        assert_eq!(engine.execute(chargeback).err(), Some(ExecutionError::NonDisputedTransaction));
+        assert_eq!(
+            engine.execute(chargeback).err(),
+            Some(ExecutionError::NonDisputedTransaction)
+        );
     }
 
     #[test]
@@ -252,6 +273,9 @@ mod tests {
         let dispute = Transaction::Dispute(1, 100);
         assert!(engine.execute(dispute).is_ok());
         let dispute_again = Transaction::Dispute(1, 100);
-        assert_eq!(engine.execute(dispute_again).err(), Some(ExecutionError::AlreadyDisputedTransaction));
+        assert_eq!(
+            engine.execute(dispute_again).err(),
+            Some(ExecutionError::AlreadyDisputedTransaction)
+        );
     }
 }
