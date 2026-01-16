@@ -55,8 +55,12 @@ The engine streams source csv instead of loading entire file. It's provided by t
 csv::Reader::from_path(filename)
 ```
 
-### Transactions and Clients Indexing
-Transactions and clients are indexed by the transaction ID and client ID respectively. We use `std::collections::BTreeMap` instead of `std::collections::HashMap` for transactions and accounts indexing. The hashmap has performance issues for large datasets. Collision resolution for a large number of hash values significantly increases complexity. Therefore, we use BTreeMap has a stable O(log(N)) performance and doesn't depend on the data size.
+### Data Storing
+Transactions and clients are stored as maps with keys = transaction ID and client ID respectively. 
+
+We use `std::collections::BTreeMap` instead of `std::collections::HashMap` for transactions and accounts indexing.
+
+The hashmap has performance issues for large datasets. Collision resolution for a large number of hash values significantly increases complexity. Therefore, we use BTreeMap has a stable O(log(N)) performance and doesn't depend on the data size.
 
 ## Testing
 
