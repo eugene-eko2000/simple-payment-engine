@@ -64,10 +64,10 @@ The hashmap has performance issues for large datasets. Collision resolving for a
 
 ## Testing
 
-### Unit test
+### Unit Tests
 The critical part of the engine is a transactions execution. Engine unit tests are focused on checking transaction sequence in different cases incl. corner cases with expected failures.
 
-### Whole flow test script
+### Whole Flow Test Script
 The test script tests the engine on a simple transactions sequence that contains all transaction types. It compares an output with a golden control sample.
 
 Running the test:
