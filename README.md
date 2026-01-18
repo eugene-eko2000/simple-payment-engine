@@ -52,7 +52,7 @@ Let's see how this flow could look for the withdrawal transaction if we apply th
 
 These numbers look incorrect. Withdrawal transaction dispure requires a specific design which isn't present in the assessment description. Therefore, the engine checks the transaction type  explicitly and rejects the dispute on the withdrawal transaction.
 
-Also, we are potentially going to overdraft if there was a withdraw between deposit and dispute. Then, in case of a followed chargeback the account can get a negative total. It is actually a current implementation.
+Also, we are potentially going to overdraft if there was a withdraw between deposit and dispute. Then, in case of a followed chargeback the account can get a negative total.
 
 ## Implementation Details
 ### Transactions
