@@ -89,9 +89,9 @@ Transactions and clients are stored as maps with keys = transaction ID and clien
 
 We use `std::collections::BTreeMap` instead of `std::collections::HashMap` for transactions and accounts indexing.
 
-The hashmap has performance issues for large datasets. Benchmark shows `~100x` performance drop for hash map of `capacity = u32::MAX` which is equal to max number of transactions that are to be supported by the engine. The issue is in a allocation of a huge memory amount. The BTreeMap allocates memory for each element, so a huge memory allocation problem doesn't hit it. 
+The hashmap has performance issues for large datasets. Benchmark shows `~100x` performance drop for hash map of `capacity = u32::MAX` which is equal to max number of transactions that are to be supported by the engine. The issue is an allocation of a huge memory amount. On the other hand, the BTreeMap allocates memory for each element, so a huge memory allocation problem doesn't hit it. 
 
-Therefore, we use BTreeMap that has a predictable `O(log(N))` performance.
+Therefore, we use BTreeMap that has a predictable `O(log(N))` performance. We don't consider ordering, the reason of using BTreeMap is a performance only. 
 
 ## Testing
 
