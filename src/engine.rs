@@ -103,15 +103,15 @@ impl Engine {
     }
 
     pub fn print_client_report(&self) {
-        let mut wtr = Writer::from_writer(io::stdout());
+        let mut writer = Writer::from_writer(io::stdout());
 
         // Write header
-        wtr.write_record(&["client", "available", "held", "total", "locked"])
+        writer.write_record(&["client", "available", "held", "total", "locked"])
             .expect("failed to write CSV header");
 
         // Write rows
         for client in self.clients.values() {
-            wtr.write_record(&[
+            writer.write_record(&[
                 client.id.to_string(),
                 client.available.to_string(),
                 client.held.to_string(),
@@ -122,14 +122,7 @@ impl Engine {
         }
 
         // Ensure all data is flushed
-        wtr.flush().expect("failed to flush CSV writer");
-        // println!("client,available,held,total,locked");
-        // for client in self.clients.values() {
-        //     println!(
-        //         "{},{:.4},{:.4},{:.4},{}",
-        //         client.id, client.available, client.held, client.total, client.locked
-        //     );
-        // }
+        writer.flush().expect("failed to flush CSV writer");
     }
 
     fn fetch_disputed_transaction(&self, tx_id: u32) -> Result<(u16, Decimal), ExecutionError> {
