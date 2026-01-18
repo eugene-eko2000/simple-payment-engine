@@ -45,12 +45,12 @@ Let's see how this flow could look for the withdrawal transaction if we apply th
 | Transaction | Amount | Available | Held | Total |
 | ----------- | ------ | --------- | ---- | ----- |
 | Deposit | 100 | 100 | 0 | 100 |
-| Withdraw | 70 | 30 | 0 | 30 | 
+| Withdrawal | 70 | 30 | 0 | 30 | 
 | Dispute | | -40 | 70 | 30 |
 | Chargeback | | -40 | 0 | -40 |
 
 
-These numbers look incorrect. Withdrawal transaction dispure requires a specific design which isn't present in the assessment description. Therefore, the engine checks the transaction type  explicitly and rejects the dispute on the withdraw transaction.
+These numbers look incorrect. Withdrawal transaction dispure requires a specific design which isn't present in the assessment description. Therefore, the engine checks the transaction type  explicitly and rejects the dispute on the withdrawal transaction.
 
 Also, we are potentially going to overdraft if there was a withdraw between deposit and dispute. Then, in case of a followed chargeback the account can get a negative total. It is actually a current implementation.
 
