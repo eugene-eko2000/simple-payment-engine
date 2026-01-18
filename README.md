@@ -2,12 +2,12 @@
 
 This is a naive implementation of a simple payment engine. It takes a transactions CSV file and outputs accounts as another CSV. 
 
-**Usage**
+### Usage
 ```
 cargo run --release -- transactions.csv > clients.csv
 ```
 
-**Data format**
+### Data format
 
 Input Example
 ```
@@ -24,6 +24,35 @@ client,available,held,total,locked
 2,2,0,2,false
 1,1.5,0,1.5,false
 ```
+
+## The program logic
+
+The logic is described in the assessment document.
+
+### Dispute caveat
+The described dispute flow assumes that the dispute can be made only on a deposit transaction, not on a withdrawal one.
+
+Let's take a look at this example:
+
+| Transaction | Amount | Available | Held | Total |
+| ----------- | ------ | --------- | ---- | ----- |
+| Deposit | 100 | 100 | 0 | 100 |
+| Dispute | | 0 | 100 | 100 |
+| Chargeback | | 0 | 0 | 0 |
+
+Let's see how this flow could look for the withdrawal transaction if we apply the described logic.
+
+| Transaction | Amount | Available | Held | Total |
+| ----------- | ------ | --------- | ---- | ----- |
+| Deposit | 100 | 100 | 0 | 100 |
+| Withdraw | 70 | 30 | 0 | 30 | 
+| Dispute | | -40 | 70 | 30 |
+| Chargeback | | -40 | 0 | -40 |
+
+
+These numbers look incorrect. Withdrawal transaction dispure requires a specific design which isn't present in the assessment description. Therefore, the engine checks the transaction type  explicitly and rejects the dispute on the withdraw transaction.
+
+Also, we are potentially going to overdraft if there was a withdraw between deposit and dispute. Then, in case of a followed chargeback the account can get a negative total. It is actually a current implementation.
 
 ## Implementation Details
 ### Transactions
@@ -60,7 +89,7 @@ Transactions and clients are stored as maps with keys = transaction ID and clien
 
 We use `std::collections::BTreeMap` instead of `std::collections::HashMap` for transactions and accounts indexing.
 
-The hashmap has performance issues for large datasets. Benchmark shows `~100x` performance drop for hash map of `capacity = u32::MAX` which is equal to max number of transactions that are to be supported by the engine. The issue is an extremely large number of collisions, the performance is dropped on their resolving. A significant performance drop starts from the hash map size > 200M items.
+The hashmap has performance issues for large datasets. Benchmark shows `~100x` performance drop for hash map of `capacity = u32::MAX` which is equal to max number of transactions that are to be supported by the engine. The issue is in a allocation of a huge memory amount. The BTreeMap allocates memory for each element, so a huge memory allocation problem doesn't hit it. 
 
 Therefore, we use BTreeMap that has a predictable `O(log(N))` performance.
 

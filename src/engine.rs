@@ -132,7 +132,6 @@ impl Engine {
             .ok_or(ExecutionError::TransactionNotFound)?;
         match transaction {
             Transaction::Deposit(client_id, _, amount) => Ok((*client_id, *amount)),
-            Transaction::Withdrawal(client_id, _, amount) => Ok((*client_id, *amount)),
             _ => Err(ExecutionError::IneligibleTransaction),
         }
     }
@@ -255,6 +254,19 @@ mod tests {
         assert_eq!(
             engine.execute(chargeback).err(),
             Some(ExecutionError::NonDisputedTransaction)
+        );
+    }
+
+    #[test]
+    fn test_execution_dispute_ineligible_transaction() {
+        let mut engine = Engine::new();
+        assert!(engine.execute(Transaction::Deposit(1, 100, Decimal::new(100000, 4))).is_ok());
+        let withdrawal = Transaction::Withdrawal(1, 101, Decimal::new(100000, 4));
+        assert!(engine.execute(withdrawal).is_ok());
+        let dispute = Transaction::Dispute(1, 101);
+        assert_eq!(
+            engine.execute(dispute).err(),
+            Some(ExecutionError::IneligibleTransaction)
         );
     }
 
